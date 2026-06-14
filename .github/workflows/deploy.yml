@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: "speakr"
-          target: "/root/bin/"
+          target: "/usr/local/bin/"
 
       # 5. 실행권한 부여 + 확인
       - name: Set permissions & verify
@@ -44,6 +44,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            mkdir -p /root/bin
-            chmod +x /root/bin/speakr
-            /root/bin/speakr
+            chmod +x /usr/local/bin/speakr
+            speakr
