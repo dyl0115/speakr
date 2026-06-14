@@ -1,0 +1,49 @@
+name: Deploy speakr
+
+# main 브랜치에 push 되면 실행
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 가져오기
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Go 설치
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # 3. linux/arm64로 크로스컴파일
+      - name: Build for ARM64
+        run: GOOS=linux GOARCH=arm64 go build -o speakr .
+
+      # 4. 서버로 바이너리 전송 (scp)
+      - name: Copy binary to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "speakr"
+          target: "/root/bin/"
+
+      # 5. 실행권한 부여 + 확인
+      - name: Set permissions & verify
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            mkdir -p /root/bin
+            chmod +x /root/bin/speakr
+            /root/bin/speakr
