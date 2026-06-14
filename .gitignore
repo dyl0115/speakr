@@ -1,0 +1,12 @@
+# 빌드 결과물
+speakr
+speakr.exe
+
+# 설정/비밀
+.env
+config.json
+
+# OS/에디터
+.DS_Store
+.idea/
+.vscode/
